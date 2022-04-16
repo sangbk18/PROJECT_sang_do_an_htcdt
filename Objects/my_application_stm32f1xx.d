@@ -13,4 +13,5 @@
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stddef.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h \
-  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h My_sensors_lib.h
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h My_sensors_lib.h \
+  MY_RTOS.h

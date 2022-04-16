@@ -89,6 +89,41 @@ void FLash_erase(volatile uint32_t adress_start)
 	FLASH->CR &= ~(1U<<6);
 }
 /*==========================================FLASH_OPRATION================================================*/
+/*===========================================RTC_clock====================================================*/
+void RTC_init(void)
+{
+	RCC->APB1ENR |= (3U<<27);
+	PWR->CR |= (1U<<8);//set bit DMP
+	RCC->BDCR |= (1U<<0);
+	while(((RCC->BDCR >> 1U) & 0x01) != 1U)
+	{
+		/**/
+	}
+	RCC->BDCR &= ~(3U<<8);
+	RCC->BDCR |= (1U<<8);
+	RCC->BDCR |= (1U<<15);
+	/*select source clock for real time clock*/
+	/*HSE clock devide 128*/
+	/*configuration RTC*/
+	while(((RTC->CRL >> 5U)&0x01) != 1U)
+	{
+		/*wait bit RTOFF set*/
+	}
+	RTC->CRL |= (1U<<4);
+	RTC->CRH |= (1U<<0);//enable interrupt second;
+	RTC->PRLH = 0U;
+	*(volatile uint32_t*)0x4000280C = 0x7FFFU;
+	RTC->CRL &= ~(1U<<4);
+	while((uint8_t)((RTC->CRL>>5)&0x01) == 0U)
+	{
+		/*wait bit RTOFF set*/
+	}
+	while(((RTC->CRL >> 5U)&0x01) != 1U)
+	{
+		/*wait bit RTOFF set*/
+	}
+}
+/*===========================================RTC_clock====================================================*/
 /*========================================MY_CONFIG_INTERRUPT=============================================*/
 /*========================================unit_test=======================================================*/
 bool assert_paramater(bool condition)
@@ -546,7 +581,7 @@ void UART_DMA_RX_init(USART_TypeDef *uart)
 	DMA1_Channel5->CCR &= ~(3U<<12);
 	DMA1_Channel5->CCR |= (1U<<1); // enable interrupt transfer data complete
 }
-void DMA_UART_RX(volatile uint16_t *adress_memory,volatile uint16_t *adress_peripheral,volatile uint16_t size)
+void DMA_UART_RX(volatile uint8_t *adress_memory,volatile uint16_t *adress_peripheral,volatile uint16_t size)
 {
 	DMA1_Channel5->CMAR = (uint32_t)adress_memory;
 	DMA1_Channel5->CPAR = (uint32_t)adress_peripheral;

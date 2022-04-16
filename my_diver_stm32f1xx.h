@@ -14,6 +14,7 @@
 #include "stdbool.h"
 
 #define adress_VTOR_remap  0x20000000 
+#define ADDRESS_BOOTLOADER 0x08006000 
 #define adress_flash_start 0x08007C00 
 #define adress_flash       0x08000000
 /*=========================================FLASH_OPRATION=================================================*/
@@ -22,6 +23,9 @@ void Flash_read(volatile uint32_t adress_start,volatile uint32_t * data,volatile
 void FLash_erase(volatile uint32_t adress_start);
 void FLash_read_half_word(volatile uint32_t adress_start,volatile uint16_t * data,volatile uint32_t size);
 /*==========================================FLASH_OPRATION================================================*/
+/*===========================================RTC_clock====================================================*/
+void RTC_init(void);
+/*===========================================RTC_clock====================================================*/
 /*========================================MY_CONFIG_INTERRUPT=============================================*/
 typedef void (*my_func)(void);
 typedef enum
@@ -113,7 +117,7 @@ void MLX9014_read(uint16_t *tem);
 /*==========================================UART_typedef==================================================*/
 typedef enum
 {
-	_USART1 = 0x40013800,
+	_USART1 = 0x40013800U,
 }UART_Adress_Typedef;
 void UART_init(USART_TypeDef *uart);
 void UART_data(USART_TypeDef *uart,uint8_t data);
@@ -126,13 +130,13 @@ void DMA_UART_TX(volatile uint16_t *adress_memory,volatile uint16_t *adress_peri
 /*=======================================UART_TX_DMA_typedef==============================================*/
 /*=======================================UART_RX_DMA_typedef==============================================*/
 void UART_DMA_RX_init(USART_TypeDef *uart);
-void DMA_UART_RX(volatile uint16_t *adress_memory,volatile uint16_t *adress_peripheral,volatile uint16_t size);
+void DMA_UART_RX(volatile uint8_t *adress_memory,volatile uint16_t *adress_peripheral,volatile uint16_t size);
 /*=======================================UART_RX_DMA_typedef==============================================*/
 /*=======================================SPI_config=======================================================*/
 typedef enum
 {
-	_SPI1_ADRESS = 0x40013000,
-	_SPI2_ADRESS = 0x01,
+	_SPI1_ADRESS = 0x40013000U,
+	_SPI2_ADRESS = 0u,
 }SPI_Adress_Typedef;
 void SPI_init(SPI_TypeDef *spi);
 void SPI_send(SPI_TypeDef *spi,uint8_t *data,uint8_t size);

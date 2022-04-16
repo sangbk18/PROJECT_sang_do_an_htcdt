@@ -4,7 +4,7 @@
 #include "my_diver_stm32f1xx.h"
 #include "My_sensors_lib.h"
 /*dung de ep kieu cac loai function pointer*/
-
+extern volatile uint8_t frame_data_bootloader[7U*1023U];
 /*dam bao do chinh xac cua type_typedef*/
 
 typedef enum
@@ -12,7 +12,7 @@ typedef enum
 	ID_MAIN_MENU = 0u,
 	ID_GARDEN_1,
 	ID_GARDEN_2,
-	ID_GARDEN_3,
+	ID_UPDATE,
 	ID_SENSORS_1,
 	ID_ACTUATORS_1,
 	ID_SETTING_1,
@@ -23,11 +23,11 @@ typedef enum
 #define IS_ID_TYPEDEF(ID) (((ID) == ID_MAIN_MENU)    ||\
                             ((ID) == ID_GARDEN_1)    ||\
 														((ID) == ID_GARDEN_2)    ||\
-														((ID) == ID_GARDEN_3)    ||\
+														((ID) == ID_UPDATE)      ||\
 														((ID) == ID_SENSORS_1)   ||\
 														((ID) == ID_ACTUATORS_1) ||\
 														((ID) == ID_SETTING_1)  ||\
-                            ((ID) == ID_OUTHOUSE_1))
+                            ((ID) == ID_OUTHOUSE_1)) 
 /*=====================================define_fuction_pointer======================================*/
 extern volatile DATA_DHT11_Typedef data_dht11;
 struct _my_struct_pointer_dht11
@@ -59,7 +59,7 @@ struct my_menu
 	volatile struct my_menu *p_menu_3;void (*my_active_3[3])(void *p,TYPE_Typedef type);
 };
 typedef struct my_menu MENU_Typedef;
-extern MENU_Typedef MAIN_MENU,GARDEN_1,GARDEN_2,GARDEN_3,SENSORS_1,ACTUATORS_1,SETTING_1,DHT11_1,THRESOLD_1,OUTHOUSE_1;
+extern MENU_Typedef MAIN_MENU,GARDEN_1,GARDEN_2,UPDATE,SENSORS_1,ACTUATORS_1,SETTING_1,DHT11_1,THRESOLD_1,OUTHOUSE_1;
 extern volatile MENU_Typedef* MENU_ACTIVE;
 typedef enum
 {
@@ -89,4 +89,7 @@ typedef struct _data_thresold DATA_THRESOLD_Typedef;
 extern DATA_THRESOLD_Typedef data_thresold;
 /*==========================================define_thresold================================================*/
 void hienthi(I2C_TypeDef* I2C,volatile MENU_Typedef *menu,volatile uint8_t position);
+/*=======================================BOOTLOADER================================================*/
+void start_update_application(void *p,TYPE_Typedef type);
+/*=======================================BOOTLOADER================================================*/
 #endif

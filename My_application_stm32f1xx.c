@@ -1,4 +1,5 @@
 #include "My_application_stm32f1xx.h"
+#include "MY_RTOS.h"
 
 /*=====================================define_fuction_pointer======================================*/
 /*--------------------------------dht11_define----------------------------*/
@@ -16,17 +17,24 @@ if(type == _DHT11_FUNC_TYPEDEF)
 	}
 }
 /*=====================================define_fuction_pointer======================================*/
-
+/*=======================================BOOTLOADER================================================*/
+void start_update_application(void *p,TYPE_Typedef type)
+{
+	p=NULL;
+	type = 0;
+	bootloader_init(ADDRESS_BOOTLOADER);
+}
+/*=======================================BOOTLOADER================================================*/
 MENU_Typedef MAIN_MENU = {
 	ID_MAIN_MENU,
 	NULL,
-	"      MAIN_MENU     ",
+	"      MAIN_MENU    ",
 	"  GARDEN_1         ",
 	&GARDEN_1,{NULL,NULL,NULL},
 	"  GARDEN_2         ",
 	&GARDEN_2,{NULL,NULL,NULL},
-	"  GARDEN_3         ",
-	&GARDEN_3,{NULL,NULL,NULL},
+	"  UPDATE_VERSION:",
+	NULL,{NULL,NULL,NULL},
 };
 /*===========================*/
 MENU_Typedef GARDEN_1 = {
@@ -51,15 +59,15 @@ MENU_Typedef GARDEN_2 = {
 	"  SETTING           ",
 	NULL,{NULL,NULL,NULL},
 };
-MENU_Typedef GARDEN_3 = {
-	ID_GARDEN_3,
+MENU_Typedef UPDATE = {
+	ID_UPDATE,
 	&MAIN_MENU,
-	"      GARDEN_3      ",
-	"  SENSORS           ",
+	"      UPDATE        ",
+	"  YES_UPDATE        ",
+	NULL,{NULL,NULL,&start_update_application},
+	"  NO_UPDATE         ",
 	NULL,{NULL,NULL,NULL},
-	"  ACTUATORS         ",
-	NULL,{NULL,NULL,NULL},
-	"  SETTING           ",
+	"  THAI_VAN_SANG     ",
 	NULL,{NULL,NULL,NULL},
 };
 /*===========================*/
@@ -127,12 +135,13 @@ MENU_Typedef OUTHOUSE_1 = {
 	NULL,{NULL,NULL,NULL},
 	"  PUSH OUT :      CM",
 	NULL,{NULL,NULL,NULL},
-	"  WARNING  :        ",
+	"  WARNING :         ",
 	NULL,{NULL,NULL,NULL},
 };
 /*---------------------------------------------------------DEFINNE GARDEN 1------------------------------------------------------------*/
 /*===================================define_fuction======================================*/
 char S_SAMPLE[20] = "";
+
 void hienthi(I2C_TypeDef* I2C,volatile MENU_Typedef *menu,volatile uint8_t position)
 {
 	  if(menu->ID == ID_THRESOLD_1)
@@ -163,15 +172,26 @@ void hienthi(I2C_TypeDef* I2C,volatile MENU_Typedef *menu,volatile uint8_t posit
 			lcd_string(I2C,menu->title_node_2);
 			lcd_gotoxy(I2C,4,0);
 			lcd_string(I2C,menu->title_node_3);
-			if(position == 4)
+			lcd_gotoxy(I2C,position,0);
+			lcd_string(I2C,">");
+		}
+		else if(menu->ID == ID_MAIN_MENU)
+		{
+			lcd_gotoxy(I2C,1,0);
+			lcd_string(I2C,menu->title_main);
+			lcd_gotoxy(I2C,2,0);
+			lcd_string(I2C,menu->title_node_1);
+			lcd_gotoxy(I2C,3,0);
+			lcd_string(I2C,menu->title_node_2);
+			lcd_gotoxy(I2C,4,0);
+			lcd_string(I2C,menu->title_node_3);
+			lcd_gotoxy(I2C,position,0);
+			lcd_string(I2C,">");
+			if(frame_data_bootloader[0] == 's' && frame_data_bootloader[1] == 'a' && frame_data_bootloader[2] == 'n' && frame_data_bootloader[3] == 'g' )
 			{
-				lcd_gotoxy(I2C,position,0);
-			  lcd_string(I2C,"<>");
-			}
-			else
-			{
-				lcd_gotoxy(I2C,position,0);
-			  lcd_string(I2C,">");
+				lcd_gotoxy((I2C_TypeDef*)_I2C1_ADRESS,4,17);
+				lcd_string((I2C_TypeDef*)_I2C1_ADRESS,"(*)");
+				MAIN_MENU.p_menu_3 = &UPDATE;
 			}
 		}
 		else
