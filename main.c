@@ -261,6 +261,7 @@ void my_task_ide(void)
 }
 static volatile	uint8_t size[2] = {0U};
 static volatile uint8_t data_flash[1023U*7U] = {0};
+static volatile uint8_t check_write_flash = 0U;
 void my_task_1(void)
 {
 	i2c_init((I2C_TypeDef*)_I2C1_ADRESS);
@@ -273,6 +274,7 @@ void my_task_1(void)
 	{
 			if(frame_data_bootloader[0] == 's' && frame_data_bootloader[1] == 'a' && frame_data_bootloader[2] == 'n' && frame_data_bootloader[3] == 'g' )
 			{
+				++check_write_flash;
 				uint32_t dem =0;
 				uint32_t i = 0;
 				for(dem = 4; dem < 8;dem+=2)
@@ -280,15 +282,25 @@ void my_task_1(void)
 					size[i] =get_hex(frame_data_bootloader[dem],frame_data_bootloader[dem+1]);
 					i++;
 				}
-				uint32_t *length = (uint32_t*)&size[0];
+			  uint32_t *length = (uint32_t*)&size[0];
 				dem = 0;
 				i=0;
-				for(dem = 8U;dem < (uint32_t)*length;dem+=2)
+				for(dem = 8U;dem < (uint32_t)*length;dem+=2U)
 				{
 					data_flash[i] = get_hex(frame_data_bootloader[dem],frame_data_bootloader[dem+1]);
 					i++;
 				}
-				
+				dem = 0;
+				for(dem = 0U;dem < 7U;dem++)
+				{
+					 FLash_erase(ADDRESS_BOOTLOADER + 1023U*dem);
+				}
+				Flash_write(ADDRESS_BOOTLOADER,(volatile uint16_t*)&data_flash[0],*length);
+	      task_delay(100);
+				if(check_write_flash == 2U)
+				{
+					frame_data_bootloader[0] = 'x';
+				}
 			}
 //		GPIOA->ODR |= (1U<<8);
 //		task_delay(500);

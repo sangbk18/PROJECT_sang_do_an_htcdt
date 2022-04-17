@@ -22,7 +22,9 @@ void start_update_application(void *p,TYPE_Typedef type)
 {
 	p=NULL;
 	type = 0;
+	task_delay(3000);
 	bootloader_init(ADDRESS_BOOTLOADER);
+	
 }
 /*=======================================BOOTLOADER================================================*/
 MENU_Typedef MAIN_MENU = {
@@ -187,7 +189,7 @@ void hienthi(I2C_TypeDef* I2C,volatile MENU_Typedef *menu,volatile uint8_t posit
 			lcd_string(I2C,menu->title_node_3);
 			lcd_gotoxy(I2C,position,0);
 			lcd_string(I2C,">");
-			if(frame_data_bootloader[0] == 's' && frame_data_bootloader[1] == 'a' && frame_data_bootloader[2] == 'n' && frame_data_bootloader[3] == 'g' )
+			if(frame_data_bootloader[1] == 'a' && frame_data_bootloader[2] == 'n' && frame_data_bootloader[3] == 'g' )
 			{
 				lcd_gotoxy((I2C_TypeDef*)_I2C1_ADRESS,4,17);
 				lcd_string((I2C_TypeDef*)_I2C1_ADRESS,"(*)");
