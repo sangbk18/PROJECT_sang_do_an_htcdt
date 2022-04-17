@@ -185,6 +185,21 @@
           <WinNumber>1</WinNumber>
           <ItemText>check_write_flash</ItemText>
         </Ww>
+        <Ww>
+          <count>7</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>position_control</ItemText>
+        </Ww>
+        <Ww>
+          <count>8</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>MENU_ACTIVE</ItemText>
+        </Ww>
+        <Ww>
+          <count>9</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>DATA_PERIPHERAL</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>

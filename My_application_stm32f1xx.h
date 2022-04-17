@@ -6,7 +6,6 @@
 /*dung de ep kieu cac loai function pointer*/
 extern volatile uint8_t frame_data_bootloader[7U*1023U];
 /*dam bao do chinh xac cua type_typedef*/
-
 typedef enum
 {
 	ID_MAIN_MENU = 0u,
@@ -19,6 +18,7 @@ typedef enum
 	ID_DHT11_1,
 	ID_THRESOLD_1,
 	ID_OUTHOUSE_1,
+	ID_CONTROL_1,
 }ID_Typedef;
 #define IS_ID_TYPEDEF(ID) (((ID) == ID_MAIN_MENU)    ||\
                             ((ID) == ID_GARDEN_1)    ||\
@@ -26,8 +26,9 @@ typedef enum
 														((ID) == ID_UPDATE)      ||\
 														((ID) == ID_SENSORS_1)   ||\
 														((ID) == ID_ACTUATORS_1) ||\
-														((ID) == ID_SETTING_1)  ||\
-                            ((ID) == ID_OUTHOUSE_1)) 
+														((ID) == ID_SETTING_1)   ||\
+                            ((ID) == ID_OUTHOUSE_1)) ||\
+                            ((ID) == ID_CONTROL_1)) 
 /*=====================================define_fuction_pointer======================================*/
 extern volatile DATA_DHT11_Typedef data_dht11;
 struct _my_struct_pointer_dht11
@@ -59,7 +60,7 @@ struct my_menu
 	volatile struct my_menu *p_menu_3;void (*my_active_3[3])(void *p,TYPE_Typedef type);
 };
 typedef struct my_menu MENU_Typedef;
-extern MENU_Typedef MAIN_MENU,GARDEN_1,GARDEN_2,UPDATE,SENSORS_1,ACTUATORS_1,SETTING_1,DHT11_1,THRESOLD_1,OUTHOUSE_1;
+extern MENU_Typedef MAIN_MENU,GARDEN_1,GARDEN_2,UPDATE,SENSORS_1,ACTUATORS_1,SETTING_1,DHT11_1,THRESOLD_1,OUTHOUSE_1,CONTROL_1;
 extern volatile MENU_Typedef* MENU_ACTIVE;
 typedef enum
 {

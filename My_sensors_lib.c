@@ -394,3 +394,47 @@ void RTC_get(I2C_TypeDef *I2C,MY_RTC_Typedef *p_RTC)
 	}
 }
 /*===================================================RTC_1307======================================================*/
+/*===================================================74HC595=======================================================*/
+void IC74HC595_config(void);
+void IC74HC595_start(uint8_t data);
+/*===================================================74HC595=======================================================*/
+/*===================================================control_peripheral============================================*/
+uint8_t str_len(char* s)
+{
+	static uint8_t i=0;
+	while(*s != '\0')
+	{
+		i++;
+		s++;
+	}
+	return i;
+}
+char* invert(char* s)
+{
+	uint8_t left = 2U;
+	uint8_t right = str_len(s) - 4U;
+	while(left < right)
+	{
+		char c = *(s+left);
+		*(s+left) = *(s+right);
+		*(s+right) = c;
+		left++;
+		right--;
+	}
+	return s;
+}
+char* update_value(uint8_t data,char *s)
+{
+	uint8_t i=0;
+	for(i=0;i<8U;i++)
+	{
+		if((data&(1<<i)) != 0U)
+		{
+			*(s + (int)(((uint8_t)i+1U)*2U)) = '1';
+		}
+		else *(s+(int)(((uint8_t)i+1U)*2U)) = '0';
+	}
+//	invert(s);
+	return s;
+}
+/*===================================================control_peripheral============================================*/

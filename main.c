@@ -1,6 +1,12 @@
+/*================================================RTOS================================================*/
+/*CREATOR : THAI VAN SANG*/
+/*DATE    :              */
 #include "MY_RTOS.h"
 #include "My_application_stm32f1xx.h"
 #include "My_sensors_lib.h"
+
+volatile uint8_t position_control = 0U;
+volatile BYTE_Typedef DATA_PERIPHERAL = {0x68};
 /*address bootloader*/
 union my_byte
 {
@@ -128,8 +134,43 @@ void EXTI1_IRQHandler(void)
 				default:
 					break;
 			}
+		
 			
 		}
+		else if(MENU_ACTIVE->ID == ID_CONTROL_1)
+		{
+			switch(position_control)
+			{
+				case 2:
+					DATA_PERIPHERAL._data.bit0 = ~DATA_PERIPHERAL._data.bit0;
+					break;
+				case 4:
+					DATA_PERIPHERAL._data.bit1 = ~DATA_PERIPHERAL._data.bit1;
+					break;
+				case 6:
+					DATA_PERIPHERAL._data.bit2 = ~DATA_PERIPHERAL._data.bit2;
+					break;
+				case 8:
+					DATA_PERIPHERAL._data.bit3 = ~DATA_PERIPHERAL._data.bit3;
+					break;
+				case 10:
+					DATA_PERIPHERAL._data.bit4 = ~DATA_PERIPHERAL._data.bit4;
+					break;
+				case 12:
+					DATA_PERIPHERAL._data.bit5 = ~DATA_PERIPHERAL._data.bit5;
+					break;
+				case 14:
+					DATA_PERIPHERAL._data.bit6 = ~DATA_PERIPHERAL._data.bit6;
+					break;
+				case 16:
+					DATA_PERIPHERAL._data.bit7 = ~DATA_PERIPHERAL._data.bit7;
+					break;
+				default:
+					break;		
+			}
+				hienthi((I2C_TypeDef*)_I2C1_ADRESS,MENU_ACTIVE,position_current);
+		}
+
 		EXTI->PR |= (1U<<1);
 	}
 }
@@ -155,6 +196,15 @@ void EXTI3_IRQHandler(void)
 	{
 	//	value_ext[3] += 1U;
 		/*----------------*/
+		if(MENU_ACTIVE->ID == ID_CONTROL_1)
+		{
+				position_control += 2U;
+			  if(position_control == 18U)
+				{
+					position_control = 2U;
+				}
+				hienthi((I2C_TypeDef*)_I2C1_ADRESS,MENU_ACTIVE,position_current);
+		}
 		switch(position_current)
 		{
 			case 2:
@@ -168,6 +218,7 @@ void EXTI3_IRQHandler(void)
 				{
 					MENU_ACTIVE = MENU_ACTIVE->p_menu_2;
 				}
+			
 				break;
 			case 4:
 				if(MENU_ACTIVE->p_menu_3 != NULL)
