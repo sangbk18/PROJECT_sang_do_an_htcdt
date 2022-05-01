@@ -2,7 +2,7 @@
 #define _MY_SENSORS_LIB
 
 #include "my_diver_stm32f1xx.h"
-
+extern volatile uint8_t position_control;
 /*===================================================DHT_11========================================================*/
 union _byte
 {  volatile uint8_t data;
@@ -20,6 +20,7 @@ union _byte
 };
 typedef union _byte BYTE_Typedef;
 extern BYTE_Typedef _byte;
+extern volatile BYTE_Typedef DATA_PERIPHERAL;
 typedef enum
 {
 	GPIO_0 = 0U,
@@ -53,7 +54,7 @@ struct _my_data_dht11
 	volatile uint8_t check_sum;
 };
 typedef struct _my_data_dht11 DATA_DHT11_Typedef;
-extern DATA_DHT11_Typedef DATA_DHT11;
+extern volatile DATA_DHT11_Typedef DATA_DHT11;
 #define IS_GPIO_ADRESS(gpio)  (((gpio) == (GPIO_TypeDef*)GPIOA_ADRESS) ||\
                                ((gpio) == (GPIO_TypeDef*)GPIOB_ADRESS) ||\
                                ((gpio) == (GPIO_TypeDef*)GPIOC_ADRESS))
@@ -140,4 +141,13 @@ extern MY_RTC_Typedef RTC_current;
 void RTC_set(I2C_TypeDef *I2C,MY_RTC_Typedef *p_RTC);
 void RTC_get(I2C_TypeDef *I2C,MY_RTC_Typedef *p_RTC);
 /*===================================================RTC_1307======================================================*/
+/*===================================================74HC595=======================================================*/
+void IC74HC595_config(void);
+void IC74HC595_start(uint8_t data);
+/*===================================================74HC595=======================================================*/
+/*===================================================control_peripheral============================================*/
+uint8_t str_len(char* s);
+char* invert(char* s);
+char* update_value(uint8_t data,char *s);
+/*===================================================control_peripheral============================================*/
 #endif

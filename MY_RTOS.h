@@ -15,6 +15,10 @@
 #define STACK_TASK_2   (ADRESS_STACK_END - (2U*SIZE_STACK))
 #define STACK_TASK_3   (ADRESS_STACK_END - (3U*SIZE_STACK))
 #define MSP_STACK      (ADRESS_STACK_END - (4U*SIZE_STACK))
+
+#define DHT11_RTOS_LOCK 0x11
+#define DHT11_RTOS_UNLOCK 0x22
+extern volatile uint8_t LOCK_NEXT_TASK;
 /*===============================================================define_size_tasks====================================================================*/
 /*===============================================================declare_fucntions====================================================================*/
 typedef enum

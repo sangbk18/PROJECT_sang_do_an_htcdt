@@ -1,6 +1,11 @@
+/*================================================RTOS================================================*/
+/*CREATOR : THAI VAN SANG*/
+/*DATE    :              */
 #include "MY_RTOS.h"
 #include "My_application_stm32f1xx.h"
 #include "My_sensors_lib.h"
+
+volatile uint8_t position_control = 0U;
 /*address bootloader*/
 union my_byte
 {
@@ -58,6 +63,7 @@ static volatile uint8_t position_current = 2U;
 volatile DATA_DHT11_Typedef data_dht11 = {10U,10U,10U,10U,10U};
 FUNC_DHT11_Typedef DHT11_INITIAL = {(TIM_TypeDef*)TIM1_ADRESS,(GPIO_TypeDef*)GPIOA_ADRESS,(DHT11_PIN_Typedef)GPIO_0,&data_dht11,(I2C_TypeDef*)_I2C1_ADRESS};
 DATA_THRESOLD_Typedef data_thresold;
+volatile BYTE_Typedef DATA_PERIPHERAL = {0xFF};
 /*initial value for rtc*/
 static volatile uint8_t rtc_value = 0U;
 
@@ -91,21 +97,21 @@ void EXTI1_IRQHandler(void)
 		/*----------------*/
 		if(MENU_ACTIVE->ID == ID_THRESOLD_1)
 		{
-	   FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,2U);
+	   FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,3U);
 			switch(position_current)
 			{
 				case 2:
 					(data_thresold.THRESOLD_TEM_VAL < 40U) ? (data_thresold.THRESOLD_TEM_VAL += 1U) : (data_thresold.THRESOLD_TEM_VAL = 20);
 					break;
 				case 3:
-					(data_thresold.THRESOLD_HUM_VAL < 60U) ? (data_thresold.THRESOLD_HUM_VAL += 1U) : (data_thresold.THRESOLD_HUM_VAL = 40);
+					(data_thresold.THRESOLD_HUM_VAL < 100U) ? (data_thresold.THRESOLD_HUM_VAL += 1U) : (data_thresold.THRESOLD_HUM_VAL = 40);
 					break;
 				default:
 					break;
 			}
 			FLash_erase(adress_flash_start);
-			volatile uint16_t data_tmp[2] = {(volatile uint16_t)data_thresold.THRESOLD_TEM_VAL,(volatile uint16_t)data_thresold.THRESOLD_HUM_VAL};
-			Flash_write(adress_flash_start,&data_tmp[0],4U);
+			volatile uint16_t data_tmp[3] = {(volatile uint16_t)data_thresold.THRESOLD_TEM_VAL,(volatile uint16_t)data_thresold.THRESOLD_HUM_VAL,(volatile uint16_t)data_thresold.DATA_CONTROL_PERIPHERAL};
+			Flash_write(adress_flash_start,&data_tmp[0],6U);
 			hienthi((I2C_TypeDef*)_I2C1_ADRESS,MENU_ACTIVE,position_current);
 		}
 		else if(MENU_ACTIVE->ID == ID_UPDATE)
@@ -128,8 +134,48 @@ void EXTI1_IRQHandler(void)
 				default:
 					break;
 			}
+		
 			
 		}
+		else if(MENU_ACTIVE->ID == ID_CONTROL_1)
+		{
+			switch(position_control)
+			{
+				case 2:
+					DATA_PERIPHERAL._data.bit0 = ~DATA_PERIPHERAL._data.bit0;
+					break;
+				case 4:
+					DATA_PERIPHERAL._data.bit1 = ~DATA_PERIPHERAL._data.bit1;
+					break;
+				case 6:
+					DATA_PERIPHERAL._data.bit2 = ~DATA_PERIPHERAL._data.bit2;
+					break;
+				case 8:
+					DATA_PERIPHERAL._data.bit3 = ~DATA_PERIPHERAL._data.bit3;
+					break;
+				case 10:
+					DATA_PERIPHERAL._data.bit4 = ~DATA_PERIPHERAL._data.bit4;
+					break;
+				case 12:
+					DATA_PERIPHERAL._data.bit5 = ~DATA_PERIPHERAL._data.bit5;
+					break;
+				case 14:
+					DATA_PERIPHERAL._data.bit6 = ~DATA_PERIPHERAL._data.bit6;
+					break;
+				case 16:
+					DATA_PERIPHERAL._data.bit7 = ~DATA_PERIPHERAL._data.bit7;
+					break;
+				default:
+					break;		
+			}
+			IC74HC595_start(DATA_PERIPHERAL.data);
+			data_thresold.DATA_CONTROL_PERIPHERAL = DATA_PERIPHERAL.data;
+			FLash_erase(adress_flash_start);
+			volatile uint16_t data_tmp[3] = {(volatile uint16_t)data_thresold.THRESOLD_TEM_VAL,(volatile uint16_t)data_thresold.THRESOLD_HUM_VAL,(volatile uint16_t)data_thresold.DATA_CONTROL_PERIPHERAL};
+			Flash_write(adress_flash_start,&data_tmp[0],6U);
+				hienthi((I2C_TypeDef*)_I2C1_ADRESS,MENU_ACTIVE,position_current);
+		}
+
 		EXTI->PR |= (1U<<1);
 	}
 }
@@ -155,6 +201,15 @@ void EXTI3_IRQHandler(void)
 	{
 	//	value_ext[3] += 1U;
 		/*----------------*/
+		if(MENU_ACTIVE->ID == ID_CONTROL_1)
+		{
+				position_control += 2U;
+			  if(position_control == 18U)
+				{
+					position_control = 2U;
+				}
+				hienthi((I2C_TypeDef*)_I2C1_ADRESS,MENU_ACTIVE,position_current);
+		}
 		switch(position_current)
 		{
 			case 2:
@@ -168,6 +223,7 @@ void EXTI3_IRQHandler(void)
 				{
 					MENU_ACTIVE = MENU_ACTIVE->p_menu_2;
 				}
+			
 				break;
 			case 4:
 				if(MENU_ACTIVE->p_menu_3 != NULL)
@@ -223,6 +279,9 @@ int main(void)
 	thread_mode_using_psp();
 	gpio_config();
 	systick_config();
+	FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,3U);
+	DATA_PERIPHERAL.data = (uint8_t)data_thresold.DATA_CONTROL_PERIPHERAL;
+	IC74HC595_config();
 	NVIC_SetPriority(SysTick_IRQn,0U);
 	NVIC_EnableIRQ(SysTick_IRQn);
 	NVIC_SetPriority(PendSV_IRQn,10U);
@@ -246,11 +305,7 @@ void SysTick_Handler(void)
 }
 void gpio_config(void)
 {
-//	RCC->APB2ENR |= (1U<<2);
-//	GPIOA->CRH &= ~(15U<<0);
-//	GPIOA->CRH &= ~(15U<<12);
-//	GPIOA->CRH |= (3U<<0);
-//	GPIOA->CRH |= (3U<<12);
+   /*configuration for pins*/
 }
 void my_task_ide(void)
 {
@@ -302,10 +357,6 @@ void my_task_1(void)
 					frame_data_bootloader[0] = 'x';
 				}
 			}
-//		GPIOA->ODR |= (1U<<8);
-//		task_delay(500);
-//		GPIOA->ODR &= ~(1U<<8);
-//		task_delay(500);
 	}	
 }
 void my_task_2(void)
@@ -314,17 +365,15 @@ void my_task_2(void)
 	ADC_DMA_init();
 	ADC_DMA_start(&adc_data,(volatile uint16_t *)&ADC1->DR,1U);
 	STEP_MOTOR_INIT();
+	IC74HC595_start(DATA_PERIPHERAL.data);
 	while(1)
 	{
-		if(adc_data < 256U)
-		{
-		START_ROTATION(_1_div_8_circle,unclockwise);
-		task_delay(1000);
-		}
-//		GPIOA->ODR |= (1U<<11);
-//		task_delay(1000);
-//		GPIOA->ODR &= ~(1U<<11);
-//		task_delay(1000);
+//		task_delay(5000);
+//		if(adc_data < 256U)
+//		{
+//		START_ROTATION(_1_div_8_circle,unclockwise);
+//		task_delay(500);
+//		}
 	}
 }
 void my_task_3(void)
@@ -350,20 +399,21 @@ void my_task_3(void)
 	{
 		if(MENU_ACTIVE->my_active_1[0] != NULL)
 		{
-		   ((void (*)(void *,TYPE_Typedef))(MENU_ACTIVE->my_active_1[0]))(&DHT11_INITIAL,_DHT11_FUNC_TYPEDEF);	
-        task_delay(5000);			
+	     // task_delay(1000);
+		   ((void (*)(void *,TYPE_Typedef))(MENU_ACTIVE->my_active_1[0]))((FUNC_DHT11_Typedef*)&DHT11_INITIAL,_DHT11_FUNC_TYPEDEF);	 	
+			 FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,2U);
+        task_delay(3000);			
 		}
-		if(MENU_ACTIVE->ID == ID_THRESOLD_1)
-		{
-			FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,2U);/*avoid overflow flash*/
-		}
+//		if(MENU_ACTIVE->ID == ID_THRESOLD_1)
+//		{
+//			FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,2U);/*avoid overflow flash*/
+//		}
 		if(data_dht11.nhiet_do_in > data_thresold.THRESOLD_TEM_VAL)		
 		{
+			DATA_PERIPHERAL.data &= ~(1U<<3);
+			IC74HC595_start(DATA_PERIPHERAL.data);
 			/*implement task */
 		}				 
-		else if(data_dht11.nhiet_do_in < data_thresold.THRESOLD_TEM_VAL)	
-		{
-      /*perform task*/
-		}
+		
 	}
 }

@@ -1,6 +1,6 @@
 #include "My_application_stm32f1xx.h"
 #include "MY_RTOS.h"
-
+static char str[21] ="< 0=0=0=0=0=0=0=0  >";
 /*=====================================define_fuction_pointer======================================*/
 /*--------------------------------dht11_define----------------------------*/
 void my_fuction_dht_implement(void *p,TYPE_Typedef type)
@@ -9,8 +9,8 @@ if(type == _DHT11_FUNC_TYPEDEF)
 	{
 		char s[10] = "";
     DHT11_init((TIM_TypeDef*)(((FUNC_DHT11_Typedef*)p)->time_dht11_used),(GPIO_TypeDef*)(((FUNC_DHT11_Typedef*)p)->gpio_dht11_used),(DHT11_PIN_Typedef)(((FUNC_DHT11_Typedef*)p)->pin_dht11_used));
-   	read_5_byte((TIM_TypeDef*)(((FUNC_DHT11_Typedef*)p)->time_dht11_used),(GPIO_TypeDef*)(((FUNC_DHT11_Typedef*)p)->gpio_dht11_used),(DHT11_PIN_Typedef)(((FUNC_DHT11_Typedef*)p)->pin_dht11_used),(DATA_DHT11_Typedef*)(((FUNC_DHT11_Typedef*)p)->data_dht11));
-    lcd_gotoxy((I2C_TypeDef*)(((FUNC_DHT11_Typedef*)p)->I2C),2,16);
+		read_5_byte((TIM_TypeDef*)(((FUNC_DHT11_Typedef*)p)->time_dht11_used),(GPIO_TypeDef*)(((FUNC_DHT11_Typedef*)p)->gpio_dht11_used),(DHT11_PIN_Typedef)(((FUNC_DHT11_Typedef*)p)->pin_dht11_used),(DATA_DHT11_Typedef*)(((FUNC_DHT11_Typedef*)p)->data_dht11));
+		lcd_gotoxy((I2C_TypeDef*)(((FUNC_DHT11_Typedef*)p)->I2C),2,16);
 		lcd_string((I2C_TypeDef*)(((FUNC_DHT11_Typedef*)p)->I2C),covert_string((( volatile DATA_DHT11_Typedef*)(((FUNC_DHT11_Typedef*)p)->data_dht11))->nhiet_do_in,s));
 	  lcd_gotoxy((I2C_TypeDef*)(((FUNC_DHT11_Typedef*)p)->I2C),3,16);
 	  lcd_string((I2C_TypeDef*)(((FUNC_DHT11_Typedef*)p)->I2C),covert_string(((volatile DATA_DHT11_Typedef*)(((FUNC_DHT11_Typedef*)p)->data_dht11))->do_am_in,s));
@@ -93,7 +93,18 @@ MENU_Typedef ACTUATORS_1 = {
 	NULL,{NULL,NULL,NULL},
 	"  OUTHOUSE          ",
 	&OUTHOUSE_1,{NULL,NULL,NULL},
-	"  ADD_DEVICE       ",
+	"  CONTROL           ",
+	&CONTROL_1,{NULL,NULL,NULL},
+};
+MENU_Typedef CONTROL_1 = {
+	ID_CONTROL_1,
+	&ACTUATORS_1,
+	"      CONTROL       ",
+	"< 0=0=0=0=0=0=0=0  >",
+	NULL,{NULL,NULL,NULL},
+	"                    ",
+	NULL,{NULL,NULL,NULL},
+	" TVS  : 1:OFF / O:ON",
 	NULL,{NULL,NULL,NULL},
 };
 MENU_Typedef SETTING_1 = {
@@ -195,6 +206,20 @@ void hienthi(I2C_TypeDef* I2C,volatile MENU_Typedef *menu,volatile uint8_t posit
 				lcd_string((I2C_TypeDef*)_I2C1_ADRESS,"(*)");
 				MAIN_MENU.p_menu_3 = &UPDATE;
 			}
+		}
+		else if(menu->ID == ID_CONTROL_1)
+		{
+			lcd_gotoxy(I2C,1,0);
+			lcd_string(I2C,menu->title_main);
+			lcd_gotoxy(I2C,2,0);
+			menu->title_node_1 = update_value(DATA_PERIPHERAL.data,&str[0]);/*display on screen bit 7 - bit 0*/
+			lcd_string(I2C,menu->title_node_1);
+			lcd_gotoxy(I2C,3,0);
+			lcd_string(I2C,menu->title_node_2);
+			lcd_gotoxy(I2C,4,0);
+			lcd_string(I2C,menu->title_node_3);
+			lcd_gotoxy(I2C,3U,position_control);
+			lcd_string(I2C,"^");
 		}
 		else
 		{

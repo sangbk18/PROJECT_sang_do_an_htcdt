@@ -28,57 +28,67 @@ Project File Date:  03/29/2022
 *** Using Compiler 'V6.15', folder: 'C:\Keil_v5\ARM\ARMCLANG\Bin'
 Rebuild target 'RTOS_SANG'
 assembling my_assembly.s...
+assembling startup_stm32f10x_md.s...
+compiling MY_RTOS.c...
 My_application_stm32f1xx.c(1): warning: In file included from...
-./My_application_stm32f1xx.h(38): warning: padding struct 'struct _my_struct_pointer_dht11' with 3 bytes to align 'data_dht11' [-Wpadded]
-   volatile DATA_DHT11_Typedef *data_dht11;
-                                ^
-My_application_stm32f1xx.c(12): warning: cast from 'volatile struct _my_data_dht11 *' to 'struct _my_data_dht11 *' drops volatile qualifier [-Wcast-qual]
-        read_5_byte((TIM_TypeDef*)(((FUNC_DHT11_Typedef*)p)->time_dht11_used),(GPIO_TypeDef*)(((FUNC_DHT11_Typedef*)p)->gpio_dht11_used),(DHT11_PIN_Typedef)(((FUNC_DHT11_Typedef*)p)->pin_dht11_used),(DATA_DHT11_Typedef*)(((FUNC_DHT11_Typedef*)p)->data_dht11));
-                                                                                                                                                                                                                            ^
-My_application_stm32f1xx.c(1): warning: In file included from...
-./My_application_stm32f1xx.h(52): warning: padding struct 'struct my_menu' with 3 bytes to align 'p_tail' [-Wpadded]
+./My_application_stm32f1xx.h(39): warning: padding struct 'struct _my_struct_pointer_dht11' with 3 bytes to align 'data_dht11' [-Wpadded]
+   DATA_DHT11_Typedef *data_dht11;
+                       ^
+./My_application_stm32f1xx.h(53): warning: padding struct 'struct my_menu' with 3 bytes to align 'p_tail' [-Wpadded]
         volatile struct my_menu *p_tail;
                                  ^
-My_application_stm32f1xx.c(161): warning: incompatible pointer types passing 'volatile uint32_t *' (aka 'volatile unsigned int *') to parameter of type 'volatile uint16_t *' (aka 'volatile unsigned short *') [-Wincompatible-pointer-types]
+My_application_stm32f1xx.c(172): warning: incompatible pointer types passing 'volatile uint32_t *' (aka 'volatile unsigned int *') to parameter of type 'volatile uint16_t *' (aka 'volatile unsigned short *') [-Wincompatible-pointer-types]
                         FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,2U);
                                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ./my_diver_stm32f1xx.h(24): note: passing argument to parameter 'data' here
 void FLash_read_half_word(volatile uint32_t adress_start,volatile uint16_t * data,volatile uint32_t size);
                                                                              ^
-4 warnings generated.
+3 warnings generated.
 compiling My_application_stm32f1xx.c...
-assembling startup_stm32f10x_md.s...
-compiling MY_RTOS.c...
-main.c(2): warning: In file included from...
-./My_application_stm32f1xx.h(52): warning: padding struct 'struct my_menu' with 3 bytes to align 'p_tail' [-Wpadded]
+main.c(5): warning: In file included from...
+./My_application_stm32f1xx.h(53): warning: padding struct 'struct my_menu' with 3 bytes to align 'p_tail' [-Wpadded]
         volatile struct my_menu *p_tail;
                                  ^
-./My_application_stm32f1xx.h(38): warning: padding struct 'struct _my_struct_pointer_dht11' with 3 bytes to align 'data_dht11' [-Wpadded]
-   volatile DATA_DHT11_Typedef *data_dht11;
-                                ^
-main.c(94): warning: incompatible pointer types passing 'volatile uint32_t *' (aka 'volatile unsigned int *') to parameter of type 'volatile uint16_t *' (aka 'volatile unsigned short *') [-Wincompatible-pointer-types]
-           FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,2U);
+main.c(64): warning: initializing 'DATA_DHT11_Typedef *' (aka 'struct _my_data_dht11 *') with an expression of type 'volatile DATA_DHT11_Typedef *' (aka 'volatile struct _my_data_dht11 *') discards qualifiers [-Wincompatible-pointer-types-discards-qualifiers]
+FUNC_DHT11_Typedef DHT11_INITIAL = {(TIM_TypeDef*)TIM1_ADRESS,(GPIO_TypeDef*)GPIOA_ADRESS,(DHT11_PIN_Typedef)GPIO_0,&data_dht11,(I2C_TypeDef*)_I2C1_ADRESS};
+                                                                                                                    ^~~~~~~~~~~
+main.c(5): warning: In file included from...
+./My_application_stm32f1xx.h(39): warning: padding struct 'struct _my_struct_pointer_dht11' with 3 bytes to align 'data_dht11' [-Wpadded]
+   DATA_DHT11_Typedef *data_dht11;
+                       ^
+main.c(100): warning: incompatible pointer types passing 'volatile uint32_t *' (aka 'volatile unsigned int *') to parameter of type 'volatile uint16_t *' (aka 'volatile unsigned short *') [-Wincompatible-pointer-types]
+           FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,3U);
                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ./my_diver_stm32f1xx.h(24): note: passing argument to parameter 'data' here
 void FLash_read_half_word(volatile uint32_t adress_start,volatile uint16_t * data,volatile uint32_t size);
                                                                              ^
-main.c(285): warning: cast from 'volatile uint8_t *' (aka 'volatile unsigned char *') to 'uint32_t *' (aka 'unsigned int *') increases required alignment from 1 to 4 [-Wcast-align]
-                          uint32_t *length = (uint32_t*)&size[0];
-                                             ^~~~~~~~~~~~~~~~~~~
-main.c(285): warning: cast from 'volatile unsigned char *' to 'unsigned int *' drops volatile qualifier [-Wcast-qual]
-                          uint32_t *length = (uint32_t*)&size[0];
-                                                        ^
-main.c(298): warning: cast from 'volatile uint8_t *' (aka 'volatile unsigned char *') to 'volatile uint16_t *' (aka 'volatile unsigned short *') increases required alignment from 1 to 2 [-Wcast-align]
-                                Flash_write(ADDRESS_BOOTLOADER,(volatile uint16_t*)&data_flash[0],*length);
-                                                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-main.c(358): warning: incompatible pointer types passing 'volatile uint32_t *' (aka 'volatile unsigned int *') to parameter of type 'volatile uint16_t *' (aka 'volatile unsigned short *') [-Wincompatible-pointer-types]
-                        FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,2U);/*avoid overflow flash*/
-                                                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+main.c(282): warning: incompatible pointer types passing 'volatile uint32_t *' (aka 'volatile unsigned int *') to parameter of type 'volatile uint16_t *' (aka 'volatile unsigned short *') [-Wincompatible-pointer-types]
+        FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,3U);
+                                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ./my_diver_stm32f1xx.h(24): note: passing argument to parameter 'data' here
 void FLash_read_half_word(volatile uint32_t adress_start,volatile uint16_t * data,volatile uint32_t size);
                                                                              ^
-7 warnings generated.
+main.c(340): warning: cast from 'volatile uint8_t *' (aka 'volatile unsigned char *') to 'uint32_t *' (aka 'unsigned int *') increases required alignment from 1 to 4 [-Wcast-align]
+                          uint32_t *length = (uint32_t*)&size[0];
+                                             ^~~~~~~~~~~~~~~~~~~
+main.c(340): warning: cast from 'volatile unsigned char *' to 'unsigned int *' drops volatile qualifier [-Wcast-qual]
+                          uint32_t *length = (uint32_t*)&size[0];
+                                                        ^
+main.c(353): warning: cast from 'volatile uint8_t *' (aka 'volatile unsigned char *') to 'volatile uint16_t *' (aka 'volatile unsigned short *') increases required alignment from 1 to 2 [-Wcast-align]
+                                Flash_write(ADDRESS_BOOTLOADER,(volatile uint16_t*)&data_flash[0],*length);
+                                                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+main.c(404): warning: incompatible pointer types passing 'volatile uint32_t *' (aka 'volatile unsigned int *') to parameter of type 'volatile uint16_t *' (aka 'volatile unsigned short *') [-Wincompatible-pointer-types]
+                         FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,2U);
+                                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./my_diver_stm32f1xx.h(24): note: passing argument to parameter 'data' here
+void FLash_read_half_word(volatile uint32_t adress_start,volatile uint16_t * data,volatile uint32_t size);
+                                                                             ^
+9 warnings generated.
 compiling main.c...
+My_sensors_lib.c(477): warning: no newline at end of file [-Wnewline-eof]
+/*===================================================control_peripheral============================================*/
+                                                                                                                     ^
+1 warning generated.
 compiling My_sensors_lib.c...
 compiling system_stm32f10x.c...
 my_driver_stm32f1xx.c(70): warning: cast from 'volatile uint16_t *' (aka 'volatile unsigned short *') to 'volatile uint32_t *' (aka 'volatile unsigned int *') increases required alignment from 2 to 4 [-Wcast-align]
@@ -90,9 +100,9 @@ void set_stack_pointer(uint32_t value_stack_pointer)
 2 warnings generated.
 compiling my_driver_stm32f1xx.c...
 linking...
-Program Size: Code=6926 RO-data=1046 RW-data=768 ZI-data=16064  
+Program Size: Code=7298 RO-data=1126 RW-data=872 ZI-data=16064  
 FromELF: creating hex file...
-".\Objects\RTOS.axf" - 0 Error(s), 13 Warning(s).
+".\Objects\RTOS.axf" - 0 Error(s), 15 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -123,7 +133,7 @@ Package Vendor: Keil
       Source file:   Device\Source\ARM\STM32F1xx_OPT.s
       Include file:  RTE_Driver\Config\RTE_Device.h
       Source file:   Device\Source\ARM\startup_stm32f10x_md.s
-Build Time Elapsed:  00:00:00
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>

@@ -10,6 +10,7 @@ void DHT11_init(TIM_TypeDef *tim,GPIO_TypeDef *GPIO,DHT11_PIN_Typedef PIN)
 	check &= assert_paramater(IS_GPIO_ADRESS(GPIO));
 	check &= assert_paramater(IS_TIM_ADRESS(tim));
 	check &= assert_paramater(IS_DHT11_PIN(PIN));
+	LOCK_NEXT_TASK = DHT11_RTOS_LOCK;
 	if(check == true)
 	{
 		if(tim == (TIM_TypeDef*)TIM1_ADRESS)
@@ -149,6 +150,7 @@ void read_5_byte(TIM_TypeDef *tim,GPIO_TypeDef *GPIO,DHT11_PIN_Typedef PIN,DATA_
 		_byte._data.bit0 = read_bit(tim,GPIO,PIN);
 		*(volatile uint8_t*)((volatile uint8_t*)P_data + dem) = _byte.data;
 	}
+	LOCK_NEXT_TASK = DHT11_RTOS_UNLOCK;
 }
 /*===================================================DHT_11========================================================*/
 /*===================================================LCD===========================================================*/
@@ -394,3 +396,82 @@ void RTC_get(I2C_TypeDef *I2C,MY_RTC_Typedef *p_RTC)
 	}
 }
 /*===================================================RTC_1307======================================================*/
+/*===================================================74HC595=======================================================*/
+void IC74HC595_config(void)
+{
+	RCC->APB2ENR |= (1U<<2);//enable clock for  port a
+	/*configuration for pin A8 - ST*/
+	GPIOA->CRH &= ~(15U<<0);
+	GPIOA->CRH |= (3U<<0);
+	GPIOA->BRR |= (1U<<8);//reset
+	/*configuration for pin A11 - ds*/
+	GPIOA->CRH &= ~(15U<<12);
+	GPIOA->CRH |= (3U<<12);
+	GPIOA->BRR |= (1U<<11);
+	/*configuration for pin A12 - SH*/
+	GPIOA->CRH &= ~(15U<<16);
+	GPIOA->CRH |= (3U<<16);
+	GPIOA->BRR |= (1U<<12);//set
+}
+void IC74HC595_start(uint8_t data)
+{
+	uint8_t dem =0;
+	uint8_t data1 = data;
+	for(dem =0;dem<8;dem++)
+	{
+		if(((data1>>7)&0x01) == 1U)
+		{
+			GPIOA->BSRR |= (1U<<11);
+		}
+		else 
+		{
+			GPIOA->BRR |= (1U<<11);
+		}
+		GPIOA->BRR |= (1U<<12);
+		GPIOA->BSRR |= (1U<<12);
+		data1 = (uint8_t)(data1 << 1U);
+	}
+	GPIOA->BRR |= (1U<<8);
+	GPIOA->BSRR |= (1U<<8);
+}
+/*===================================================74HC595=======================================================*/
+/*===================================================control_peripheral============================================*/
+uint8_t str_len(char* s)
+{
+	static uint8_t i=0;
+	while(*s != '\0')
+	{
+		i++;
+		s++;
+	}
+	return i;
+}
+char* invert(char* s)
+{
+	uint8_t left = 2U;
+	uint8_t right = str_len(s) - 4U;
+	while(left < right)
+	{
+		char c = *(s+left);
+		*(s+left) = *(s+right);
+		*(s+right) = c;
+		left++;
+		right--;
+	}
+	return s;
+}
+char* update_value(uint8_t data,char *s)
+{
+	uint8_t i=0;
+	for(i=0;i<8U;i++)
+	{
+		if((data&(1<<i)) != 0U)
+		{
+			*(s + (int)(((uint8_t)i+1U)*2U)) = '1';
+		}
+		else *(s+(int)(((uint8_t)i+1U)*2U)) = '0';
+	}
+//	invert(s);
+	return s;
+}
+/*===================================================control_peripheral============================================*/

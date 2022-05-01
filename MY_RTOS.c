@@ -3,6 +3,7 @@
 TASK_Typedef TASKS[MAX_TASKS];
 volatile uint32_t g_count = 0U;
 volatile uint8_t current_task = 1U;
+volatile uint8_t LOCK_NEXT_TASK = DHT11_RTOS_UNLOCK;
 /*==============================================================delare_glocal_variables===============================================================*/
 /*===============================================================declare_fucntions====================================================================*/
 void enable_faults_exceptions(void)
@@ -63,13 +64,20 @@ void switch_tasks(void)
 	STATE_Typedef original_state = STATE_BLOCK;
 	for(dem = 0U; dem < MAX_TASKS; dem++)
 	{
-		current_task++;
-		current_task %= MAX_TASKS;
-		original_state =  TASKS[current_task].STATUS ;
-		if(TASKS[current_task].STATUS == STATE_READY && current_task != 0U)
-		{
+		  if(current_task == 3U && LOCK_NEXT_TASK == DHT11_RTOS_LOCK)
+			{
+				current_task = 3;
+			}
+			if(LOCK_NEXT_TASK == DHT11_RTOS_UNLOCK)
+			{
+				 ++current_task;
+			}
+			current_task %= MAX_TASKS;
+	  	original_state =  TASKS[current_task].STATUS ;
+		  if(TASKS[current_task].STATUS == STATE_READY && current_task != 0U)
+		  {
 			break;
-		}
+		  }
 	}
 	if(original_state != STATE_READY)
 	{
