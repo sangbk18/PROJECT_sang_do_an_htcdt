@@ -1,6 +1,6 @@
 #include "My_application_stm32f1xx.h"
 #include "MY_RTOS.h"
-static char str[21] ="< 0=0=0=0=0=0=0=0  >";
+static char str[21] ="< 0=0=0=0=0=0=0=0  >";/*control all device outside board*/
 /*=====================================define_fuction_pointer======================================*/
 /*--------------------------------dht11_define----------------------------*/
 void my_fuction_dht_implement(void *p,TYPE_Typedef type)
@@ -90,11 +90,22 @@ MENU_Typedef ACTUATORS_1 = {
 	&GARDEN_1,
 	"    ACTUATORS_1     ",
 	"  PUMP              ",
-	NULL,{NULL,NULL,NULL},
+	&PUMP_1,{NULL,NULL,NULL},
 	"  OUTHOUSE          ",
 	&OUTHOUSE_1,{NULL,NULL,NULL},
 	"  CONTROL           ",
 	&CONTROL_1,{NULL,NULL,NULL},
+};
+MENU_Typedef PUMP_1 = {
+	ID_PUMP_1,
+	&ACTUATORS_1,
+	"       PUMP1        ",
+	"  ON                ",
+	NULL,{NULL,NULL,NULL},
+	"  OFF               ",
+	NULL,{NULL,NULL,NULL},
+	"  AUTOMATION :      ",
+	NULL,{NULL,NULL,NULL},
 };
 MENU_Typedef CONTROL_1 = {
 	ID_CONTROL_1,
@@ -144,11 +155,11 @@ MENU_Typedef OUTHOUSE_1 = {
 	ID_OUTHOUSE_1,
 	&ACTUATORS_1,
 	"     OUTHOUSE_1     ",
-	"  PULL IN  :      CM",
+	"  PULL IN           ",
 	NULL,{NULL,NULL,NULL},
-	"  PUSH OUT :      CM",
+	"  PUSH OUT          ",
 	NULL,{NULL,NULL,NULL},
-	"  WARNING :         ",
+	"  HINT ! 1_STEP = 45",
 	NULL,{NULL,NULL,NULL},
 };
 /*---------------------------------------------------------DEFINNE GARDEN 1------------------------------------------------------------*/
@@ -174,6 +185,22 @@ void hienthi(I2C_TypeDef* I2C,volatile MENU_Typedef *menu,volatile uint8_t posit
 			lcd_string(I2C,covert_string((uint16_t)data_thresold.THRESOLD_TEM_VAL,S_SAMPLE));
 			lcd_gotoxy(I2C,3,16);
 			lcd_string(I2C,covert_string((uint16_t)data_thresold.THRESOLD_HUM_VAL,S_SAMPLE));
+		}
+		else if(menu->ID == ID_PUMP_1)
+		{
+			lcd_gotoxy(I2C,1,0);
+			lcd_string(I2C,menu->title_main);
+			lcd_gotoxy(I2C,2,0);
+			lcd_string(I2C,menu->title_node_1);
+			lcd_gotoxy(I2C,3,0);
+			lcd_string(I2C,menu->title_node_2);
+			lcd_gotoxy(I2C,4,0);
+			lcd_string(I2C,menu->title_node_3);
+			lcd_gotoxy(I2C,position,0);
+			lcd_string(I2C,">");
+			FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,4U);
+			lcd_gotoxy(I2C,4,15);
+      lcd_string(I2C,covert_string((uint16_t)data_thresold.value_time_setting,S_SAMPLE));
 		}
 		else if(menu->ID == ID_OUTHOUSE_1)
 		{

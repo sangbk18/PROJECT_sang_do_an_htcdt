@@ -249,91 +249,37 @@ char* covert_string(uint16_t data,char *s)
 void STEP_MOTOR_INIT(void)
 {
 	RCC->APB2ENR |= (1U<<2);
-	GPIOA->CRL &= ~(15U<<16);
-	GPIOA->CRL |= (3U<<16);
-	GPIOA->BSRR |= (1U<<20);
-	
+	/*configuration for pin A5 - DIRECTION*/
 	GPIOA->CRL &= ~(15U<<20);
 	GPIOA->CRL |= (3U<<20);
 	GPIOA->BSRR |= (1U<<21);
-	
+	/*configuration for pin A6 - STEP*/
 	GPIOA->CRL &= ~(15U<<24);
 	GPIOA->CRL |= (3U<<24);
 	GPIOA->BSRR |= (1U<<22);
-	
+	/*configuration for pin A7 - ENABLE*/
 	GPIOA->CRL &= ~(15U<<28);
 	GPIOA->CRL |= (3U<<28);
-	GPIOA->BSRR |= (1U<<23);
+	GPIOA->BSRR |= (1U<<23); // enable module
 }
 void MOTOR_DIRECTION(Direction_Typedef direct)
 {
-	static uint8_t step = 0U;
 	if(direct == clockwise)
 	{
-		switch(step)
-		{
-			case 0:
-				GPIOA->BSRR |= (1U<<4);
-				GPIOA->BSRR |= (1U<<21);
-				GPIOA->BSRR |= (1U<<22);
-				GPIOA->BSRR |= (1U<<23);
-			  break;
-		 case 1:
-				GPIOA->BSRR |= (1U<<20);
-				GPIOA->BSRR |= (1U<<5);
-				GPIOA->BSRR |= (1U<<22);
-				GPIOA->BSRR |= (1U<<23);
-			  break;
-		 case 2:
-				GPIOA->BSRR |= (1U<<20);
-				GPIOA->BSRR |= (1U<<21);
-				GPIOA->BSRR |= (1U<<6);
-				GPIOA->BSRR |= (1U<<23);
-			  break;
-		 case 3:
-				GPIOA->BSRR |= (1U<<20);
-				GPIOA->BSRR |= (1U<<21);
-				GPIOA->BSRR |= (1U<<22);
-				GPIOA->BSRR |= (1U<<7);
-			  break;
-		}
-		step++;
-		if(step > 3) step = 0;
-		task_delay(2);
+		GPIOA->BSRR |= (1U<<21);
 	}
 	else
 	{
-		switch(step)
-		{
-			case 0:
-				GPIOA->BSRR |= (1U<<20);
-				GPIOA->BSRR |= (1U<<21);
-				GPIOA->BSRR |= (1U<<22);
-				GPIOA->BSRR |= (1U<<7);
-			  break;
-		 case 1:
-				GPIOA->BSRR |= (1U<<20);
-				GPIOA->BSRR |= (1U<<21);
-				GPIOA->BSRR |= (1U<<6);
-				GPIOA->BSRR |= (1U<<23);
-			  break;
-		 case 2:
-				GPIOA->BSRR |= (1U<<20);
-				GPIOA->BSRR |= (1U<<5);
-				GPIOA->BSRR |= (1U<<22);
-				GPIOA->BSRR |= (1U<<23);
-			  break;
-		 case 3:
-				GPIOA->BSRR |= (1U<<4);
-				GPIOA->BSRR |= (1U<<21);
-				GPIOA->BSRR |= (1U<<22);
-				GPIOA->BSRR |= (1U<<23);
-			  break;
-		}
-		step++;
-		if(step > 3) step = 0;
-		task_delay(2);
+		GPIOA->BSRR |= (1U<<5);
 	}
+  uint32_t x;
+  for(x = 0; x < 200; x++) 
+  {
+		GPIOA->BSRR |= (1U<<6);
+		task_delay(1);
+    GPIOA->BSRR |= (1U<<22);
+		task_delay(1);
+  }
 }
 void START_ROTATION(Revolution_Typedef Revolution,Direction_Typedef direct)
 {
@@ -342,10 +288,21 @@ void START_ROTATION(Revolution_Typedef Revolution,Direction_Typedef direct)
 	check &= assert_paramater(IS_DIRECTION_TYPEDEF(direct));
 	if(check == true)
 	{
+		if(direct == clockwise)
+		{
+			GPIOA->BSRR |= (1U<<21);
+		}
+		else
+		{
+			GPIOA->BSRR |= (1U<<5);
+		}
 		uint32_t dem = 0U;
 		for(dem = 0U;dem < (uint32_t)Revolution;dem++)
 		{
-			MOTOR_DIRECTION(direct);
+		GPIOA->BSRR |= (1U<<6);
+		task_delay(1);
+    GPIOA->BSRR |= (1U<<22);
+		task_delay(1);
 		}
 	}
 	else return;
@@ -475,3 +432,18 @@ char* update_value(uint8_t data,char *s)
 	return s;
 }
 /*===================================================control_peripheral============================================*/
+/*===================================================SETTING_TIME_WATER_TREE=======================================*/
+void timer1_configuration(void)
+{
+	RCC->APB2ENR |= (1U<<11); // enable clock for timer 1
+	TIM1->CR1 |= (1U<<7);
+	TIM1->CR1 &= ~(3U);
+	TIM1->ARR = 10000U - 1U;
+	TIM1->PSC = 72U - 1U;
+	TIM1->CNT = 0U;
+	TIM1->RCR = 100U - 1U;
+	TIM1->EGR |= (1U<<0);
+	TIM1->DIER |= (1U<<0);//enable interrupt;
+	TIM1->CR1 |= (1U<<0);
+}
+/*===================================================SETTING_TIME_WATER_TREE=======================================*/

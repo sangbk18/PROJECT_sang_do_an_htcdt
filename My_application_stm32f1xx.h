@@ -19,6 +19,7 @@ typedef enum
 	ID_THRESOLD_1,
 	ID_OUTHOUSE_1,
 	ID_CONTROL_1,
+	ID_PUMP_1,
 }ID_Typedef;
 #define IS_ID_TYPEDEF(ID) (((ID) == ID_MAIN_MENU)    ||\
                             ((ID) == ID_GARDEN_1)    ||\
@@ -27,8 +28,9 @@ typedef enum
 														((ID) == ID_SENSORS_1)   ||\
 														((ID) == ID_ACTUATORS_1) ||\
 														((ID) == ID_SETTING_1)   ||\
-                            ((ID) == ID_OUTHOUSE_1)) ||\
-                            ((ID) == ID_CONTROL_1)) 
+                            ((ID) == ID_OUTHOUSE_1)  ||\
+                            ((ID) == ID_CONTROL_1)   ||\
+                            ((ID) == ID_PUMP_1)) 
 /*=====================================define_fuction_pointer======================================*/
 extern volatile DATA_DHT11_Typedef data_dht11;
 struct _my_struct_pointer_dht11
@@ -60,7 +62,7 @@ struct my_menu
 	volatile struct my_menu *p_menu_3;void (*my_active_3[3])(void *p,TYPE_Typedef type);
 };
 typedef struct my_menu MENU_Typedef;
-extern MENU_Typedef MAIN_MENU,GARDEN_1,GARDEN_2,UPDATE,SENSORS_1,ACTUATORS_1,SETTING_1,DHT11_1,THRESOLD_1,OUTHOUSE_1,CONTROL_1;
+extern MENU_Typedef MAIN_MENU,GARDEN_1,GARDEN_2,UPDATE,SENSORS_1,ACTUATORS_1,SETTING_1,DHT11_1,THRESOLD_1,OUTHOUSE_1,CONTROL_1,PUMP_1;
 extern volatile MENU_Typedef* MENU_ACTIVE;
 typedef enum
 {
@@ -86,6 +88,7 @@ struct _data_thresold
 	volatile uint32_t THRESOLD_TEM_VAL;
 	volatile uint32_t THRESOLD_HUM_VAL;
 	volatile uint32_t DATA_CONTROL_PERIPHERAL;
+	volatile uint32_t value_time_setting;//time water tree
 };
 typedef struct _data_thresold DATA_THRESOLD_Typedef;
 extern DATA_THRESOLD_Typedef data_thresold;

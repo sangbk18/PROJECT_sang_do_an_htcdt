@@ -84,11 +84,11 @@ char* covert_string(uint16_t data,char *s);
 /*===================================================STEP_MOTOR====================================================*/
 typedef enum
 {
-	_1_div_8_circle = 256, //45 degree
-	_1_div_4_circle = 512, //90 degree
-	_1_div_2_circle = 1024,//180 degree
-	_1_circle = 2048, // 360 degree
-	_2_circle = 4096, //720 degree
+	_1_div_8_circle = 25, //45 degree
+	_1_div_4_circle = 50, //90 degree
+	_1_div_2_circle = 100,//180 degree
+	_1_circle = 200, // 360 degree
+	_2_circle = 400, //720 degree
 }Revolution_Typedef;
 #define IS_REVOLUTION_TYPEDEF(value) (((value) == _1_div_8_circle) ||\
                                       ((value) == _1_div_4_circle) ||\
@@ -150,4 +150,7 @@ uint8_t str_len(char* s);
 char* invert(char* s);
 char* update_value(uint8_t data,char *s);
 /*===================================================control_peripheral============================================*/
+/*===================================================SETTING_TIME_WATER_TREE=======================================*/
+void timer1_configuration(void);//used interrupt in order to set time water tree
+/*===================================================SETTING_TIME_WATER_TREE=======================================*/
 #endif
