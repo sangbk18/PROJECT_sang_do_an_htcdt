@@ -4,7 +4,7 @@
 #include "my_diver_stm32f1xx.h"
 #include "My_sensors_lib.h"
 /*dung de ep kieu cac loai function pointer*/
-extern volatile uint8_t frame_data_bootloader[7U*1023U];
+extern volatile uint8_t frame_data_bootloader[5U];
 /*dam bao do chinh xac cua type_typedef*/
 typedef enum
 {

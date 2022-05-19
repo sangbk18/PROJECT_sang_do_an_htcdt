@@ -14,6 +14,12 @@ if(type == _DHT11_FUNC_TYPEDEF)
 		lcd_string((I2C_TypeDef*)(((FUNC_DHT11_Typedef*)p)->I2C),covert_string((( volatile DATA_DHT11_Typedef*)(((FUNC_DHT11_Typedef*)p)->data_dht11))->nhiet_do_in,s));
 	  lcd_gotoxy((I2C_TypeDef*)(((FUNC_DHT11_Typedef*)p)->I2C),3,16);
 	  lcd_string((I2C_TypeDef*)(((FUNC_DHT11_Typedef*)p)->I2C),covert_string(((volatile DATA_DHT11_Typedef*)(((FUNC_DHT11_Typedef*)p)->data_dht11))->do_am_in,s));
+	  *(s + 0) = 'S';
+		covert_string(((volatile DATA_DHT11_Typedef*)(((FUNC_DHT11_Typedef*)p)->data_dht11))->do_am_in,s + 1);
+		*(s+3)= '/';
+		covert_string(((volatile DATA_DHT11_Typedef*)(((FUNC_DHT11_Typedef*)p)->data_dht11))->nhiet_do_in,s+4);
+		*(s+6)='\0';
+		UART_string((USART_TypeDef*)_USART1,s);		
 	}
 }
 /*=====================================define_fuction_pointer======================================*/

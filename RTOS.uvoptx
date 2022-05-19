@@ -235,6 +235,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>dem_time_equal_time_setting</ItemText>
         </Ww>
+        <Ww>
+          <count>17</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>frame_data_bootloader</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>

@@ -15,6 +15,8 @@ static volatile uint32_t dem_time_equal_time_setting = 0U;
 static volatile  bool status_start_water = false;
 #define TIME_REPEAT_WATER (uint8_t)0x05
 /*initialize variable in BSS region*/
+/*variable send to computer through uart communication, it 's common variable*/
+static char common_char[10] = "";
 union my_byte
 {
 	uint8_t data;
@@ -47,7 +49,12 @@ static ADC_Channel_Typedef adc_channel[2]={Channel_1,Channel_4};
 static uint16_t adc_data[2] = {0x00U,0x00U};
 static volatile uint8_t check_button_bootloader = 0U;
 /*define variable global buffer uart receive*/
-volatile uint8_t frame_data_bootloader[7U*1023U] = {0U};
+typedef enum
+{
+	_SIZE_BOOTLOADER = 7U*1023U,
+	_SIZE_CONTROL = 5U,
+}SIZE_Typedef;
+volatile uint8_t frame_data_bootloader[5U] = {0U};
 typedef enum
 {
 	_CASE_0 = 0U,
@@ -211,6 +218,12 @@ void EXTI1_IRQHandler(void)
 			volatile uint16_t data_tmp[4] = {(volatile uint16_t)data_thresold.THRESOLD_TEM_VAL,(volatile uint16_t)data_thresold.THRESOLD_HUM_VAL,(volatile uint16_t)data_thresold.DATA_CONTROL_PERIPHERAL,(volatile uint16_t)data_thresold.value_time_setting};
 			Flash_write(adress_flash_start,&data_tmp[0],8U);
 			hienthi((I2C_TypeDef*)_I2C1_ADRESS,MENU_ACTIVE,position_current);
+			*(common_char + 0) = 'C';
+			*(common_char + 1) = 'L';
+			*(common_char + 2) = '/';
+			covert_string((uint16_t)DATA_PERIPHERAL.data,common_char + 3);
+			*(common_char + 6) = '\0';
+			UART_string((USART_TypeDef*)_USART1,common_char);		
 		}
 		else if(MENU_ACTIVE->ID == ID_OUTHOUSE_1)
 		{
@@ -323,6 +336,33 @@ void DMA1_Channel5_IRQHandler(void)
 {
 	if(DMA1->ISR &(1U<<17))
 	{
+		if(frame_data_bootloader[0] == 'c' && frame_data_bootloader[1] == 'm' && frame_data_bootloader[2] == 'd')
+		{
+				/*CONNECT_SYNTAX =@= DATA */
+				/*cmd byte_data*/
+				/*cmd 18*/
+				uint8_t data_cmd = get_hex(frame_data_bootloader[3],frame_data_bootloader[4]);
+				DATA_PERIPHERAL.data = data_cmd; // 0x000 xxxx control by 4 bit LSB
+			  IC74HC595_start(DATA_PERIPHERAL.data);
+				FLash_erase(adress_flash_start);
+			  volatile uint16_t data_tmp[4] = {(volatile uint16_t)data_thresold.THRESOLD_TEM_VAL,(volatile uint16_t)data_thresold.THRESOLD_HUM_VAL,(volatile uint16_t)data_thresold.DATA_CONTROL_PERIPHERAL,(volatile uint16_t)data_thresold.value_time_setting};
+			  Flash_write(adress_flash_start,&data_tmp[0],8U);
+				frame_data_bootloader[0] = 'x';
+		}
+		if(frame_data_bootloader[0] == '@')
+		{
+				/*T hum tem*/
+				/*cmd 18*/
+				uint8_t hum = get_hex(frame_data_bootloader[1],frame_data_bootloader[2]);
+				uint8_t tem = get_hex(frame_data_bootloader[3],frame_data_bootloader[4]);
+		  	data_thresold.THRESOLD_HUM_VAL = (uint32_t)hum;
+			  data_thresold.THRESOLD_TEM_VAL = (uint32_t)tem;
+			  FLash_erase(adress_flash_start);
+			  volatile uint16_t data_tmp[4] = {(volatile uint16_t)data_thresold.THRESOLD_TEM_VAL,(volatile uint16_t)data_thresold.THRESOLD_HUM_VAL,(volatile uint16_t)data_thresold.DATA_CONTROL_PERIPHERAL,(volatile uint16_t)data_thresold.value_time_setting};
+			  Flash_write(adress_flash_start,&data_tmp[0],8U);
+				hienthi((I2C_TypeDef*)_I2C1_ADRESS,MENU_ACTIVE,position_current);
+				frame_data_bootloader[0] = 'x';
+		}
 		DMA1->IFCR |= (1U<<17);
 	}
 }
@@ -333,18 +373,24 @@ void TIM1_UP_IRQHandler(void)
 	{
 		dem_time_equal_time_setting++;
 		uint32_t calculator_time = data_thresold.value_time_setting*60;
-		if(dem_time_equal_time_setting == calculator_time)
+		if(((DATA_PERIPHERAL.data>>1)&0x01U) == 1U)
 		{
-			DATA_PERIPHERAL.data &= ~(1U<<1);//temporatery
-			status_start_water = true;
-			dem_time_equal_time_setting = 0;
+			if(dem_time_equal_time_setting == calculator_time)
+			{
+				DATA_PERIPHERAL.data &= ~(1U<<1);//temporatery
+				status_start_water = true;
+				dem_time_equal_time_setting = 0;
+			}
 		}
+		else
+		{
 		if(dem_time_equal_time_setting == TIME_REPEAT_WATER*60 && status_start_water == true)
 		{
 			DATA_PERIPHERAL.data |= (1U<<1);//temporatery
 			status_start_water = false;
 			dem_time_equal_time_setting = 0;
 		}
+  	}
 		IC74HC595_start(DATA_PERIPHERAL.data);
 		data_thresold.DATA_CONTROL_PERIPHERAL = DATA_PERIPHERAL.data;
 		TIM1->SR &= ~(1U<<0);
@@ -363,7 +409,6 @@ int main(void)
 	DATA_PERIPHERAL.data = (uint8_t)data_thresold.DATA_CONTROL_PERIPHERAL;
 	IC74HC595_config();
 	STEP_MOTOR_INIT();
-	//START_ROTATION(_2_circle,unclockwise);
 	NVIC_SetPriority(SysTick_IRQn,0U);
 	NVIC_EnableIRQ(SysTick_IRQn);
 	NVIC_SetPriority(PendSV_IRQn,10U);
@@ -396,24 +441,29 @@ void my_task_ide(void)
 		
 	}
 }
-static volatile	uint8_t size[2] = {0U};
-static volatile uint8_t data_flash[1023U*7U] = {0};
-static volatile uint8_t check_write_flash = 0U;
-
+/*variable essential when using bootloader*/
+//static volatile	uint8_t size[2] = {0U};
+//static volatile uint8_t data_flash[1023U*7U] = {0};
+/*variable essential when using bootloader*/
+//static volatile uint8_t check_write_flash = 0U;
+/*define size of DMA*/
 void my_task_1(void)
 {
 	i2c_init((I2C_TypeDef*)_I2C1_ADRESS);
 	lcd_init((I2C_TypeDef*)_I2C1_ADRESS);
 	UART_DMA_RX_init((USART_TypeDef*)_USART1);
-	DMA_UART_RX((volatile uint8_t*)&frame_data_bootloader[0],&USART1->DR,7U*1023U);
+	DMA_UART_RX((volatile uint8_t*)&frame_data_bootloader[0],&USART1->DR,_SIZE_CONTROL);
 	NVIC_EnableIRQ(DMA1_Channel5_IRQn);
 	NVIC_SetPriority(DMA1_Channel5_IRQn,2);
 	while(1)
 	{
-			if(frame_data_bootloader[0] == 's' && frame_data_bootloader[1] == 'a' && frame_data_bootloader[2] == 'n' && frame_data_bootloader[3] == 'g' )
+		
+		//ISSUE : error conflict when data received with size bootloader and dat received from signal control
+			/*if(frame_data_bootloader[0] == 's' && frame_data_bootloader[1] == 'a' && frame_data_bootloader[2] == 'n' && frame_data_bootloader[3] == 'g' )
 			{
-				/*CONNECT_SYNTAX =@= SIZE_DATA =@= DATA*/
-				/*sang 0010 60 06 00 20 6D 01 00 08 75 01 00 08 77 01 00 08*/
+				//CONNECT_SYNTAX =@= SIZE_DATA =@= DATA
+				//sang0010600600206D0100087501000877010008
+				//sang 0010 60 06 00 20 6D 01 00 08 75 01 00 08 77 01 00 08
 				++check_write_flash;
 				uint32_t dem =0;
 				uint32_t i = 0;
@@ -441,20 +491,8 @@ void my_task_1(void)
 				{
 					frame_data_bootloader[0] = 'x';
 				}
-			}
-			else if(frame_data_bootloader[0] == 'c' && frame_data_bootloader[1] == 'm' && frame_data_bootloader[2] == 'd')
-			{
-				/*CONNECT_SYNTAX =@= DATA */
-				/*cmd byte_data*/
-				/*cmd 18*/
-				uint8_t data_cmd = get_hex(frame_data_bootloader[3],frame_data_bootloader[4]);
-				DATA_PERIPHERAL.data = data_cmd; // 0x000 xxxx control by 4 bit LSB
-			  IC74HC595_start(DATA_PERIPHERAL.data);
-				if(check_write_flash == 2U)
-				{
-					frame_data_bootloader[0] = 'x';
-				}
-			}
+			}*/
+			
 	}	
 }
 static volatile uint8_t position_out_house = 0;
@@ -489,6 +527,7 @@ void my_task_2(void)
 			task_delay(300);//500
 			if(check_status_outhouse == OUTHOUSE_PULL) break;
 			}
+			position_out_house = 0;
 			check_status_outhouse = 0;
 		}
 	}
@@ -515,12 +554,12 @@ void my_task_3(void)
 	NVIC_EnableIRQ(TIM1_UP_IRQn);
 	while(1)
 	{
-			
 		if(MENU_ACTIVE->my_active_1[0] != NULL)
 		{
 		   ((void (*)(void *,TYPE_Typedef))(MENU_ACTIVE->my_active_1[0]))((FUNC_DHT11_Typedef*)&DHT11_INITIAL,_DHT11_FUNC_TYPEDEF);	 	
 			  FLash_read_half_word(adress_flash_start,(volatile uint32_t*)&data_thresold,4U);
-        task_delay(3000);			
+        task_delay(3000);	
+        
 		}
 		if(data_dht11.nhiet_do_in < data_thresold.THRESOLD_TEM_VAL)		
 		{
