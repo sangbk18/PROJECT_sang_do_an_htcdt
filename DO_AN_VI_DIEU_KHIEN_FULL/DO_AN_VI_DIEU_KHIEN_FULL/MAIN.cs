@@ -26,6 +26,7 @@ namespace DO_AN_VI_DIEU_KHIEN_FULL
         bool data_relay2 = true;
         bool data_relay3 = true;
         bool data_relay4 = true;
+        uint status_data = 0b00;
         public MAIN()
         {
             InitializeComponent();
@@ -331,68 +332,115 @@ namespace DO_AN_VI_DIEU_KHIEN_FULL
         {
             serialPort1.Write("@" + cb_hum.Text + cb_tem.Text); // send value thresold to microcontroler
         }
+        
         private void btn_relay1_Click(object sender, EventArgs e)
         {
+            data_relay1 = !data_relay1;
+            update();
+            string hex = String.Format("{0:X}", status_data);
+            serialPort1.Write("cmdF" + hex);
             if (data_relay1)
             {
-                serialPort1.Write("cmdF1");
-                data_relay1 = !data_relay1;
                 display_lbl01("ON");
             }
             else
             {
-                serialPort1.Write("cmdF0");
-                data_relay1 = !data_relay1;
                 display_lbl01("OFF");
             }
+            
         }
 
         private void btn_relay2_Click(object sender, EventArgs e)
         {
+            data_relay2 = !data_relay2;
+            update();
+            string hex = String.Format("{0:X}", status_data);
+            serialPort1.Write("cmdF" + hex);
             if (data_relay2)
             {
-                serialPort1.Write("cmdF2");
-                data_relay2 = !data_relay2;
                 display_lbl02("ON");
             }
             else
             {
-                serialPort1.Write("cmdF3");
-                data_relay2 = !data_relay2;
                 display_lbl02("OFF");
             }
         }
 
         private void btn_relay3_Click(object sender, EventArgs e)
         {
+            data_relay3 = !data_relay3;
+            update();
+            string hex = String.Format("{0:X}", status_data);
+            serialPort1.Write("cmdF" + hex);
             if (data_relay3)
             {
-                serialPort1.Write("cmdF5");
-                data_relay3 = !data_relay3;
                 display_lbl03("ON");
             }
             else
             {
-                serialPort1.Write("cmdF4");
-                data_relay3 = !data_relay3;
                 display_lbl03("OFF");
             }
         }
 
         private void btn_relay4_Click(object sender, EventArgs e)
         {
+            data_relay4 = !data_relay4;
+            update();
+            string hex = String.Format("{0:X}", status_data);
+            serialPort1.Write("cmdF" + hex);
             if (data_relay4)
             {
-                serialPort1.Write("cmdF7");
-                data_relay4 = !data_relay4;
                 display_lbl04("ON");
             }
             else
             {
-                serialPort1.Write("cmdF6");
-                data_relay4 = !data_relay4;
                 display_lbl04("OFF");
             }
+        }
+        private void update()
+        {
+            if (data_relay1 == true)
+            {
+                status_data |= 0b_0000_0001;
+            }
+            else if (data_relay1 == false)
+            {
+                status_data &= 0b_1111_1110;
+            }
+            if (data_relay2 == true)
+            {
+                status_data |= 0b_0000_0010;
+            }
+            else if (data_relay2 == false)
+            {
+                status_data &= 0b_1111_1101;
+            }
+            if (data_relay3 == true)
+            {
+                status_data |= 0b_0000_0100;
+            }
+            else if (data_relay3 == false)
+            {
+                status_data &= 0b_1111_1011;
+            }
+            if (data_relay4 == true)
+            {
+                status_data |= 0b_0000_1000;
+            }
+            else if (data_relay4 == false)
+            {
+                status_data &= 0b_1111_0111;
+            }
+        }
+
+        private void btn_pull_Click(object sender, EventArgs e)
+        {
+            serialPort1.Write("smlno"); //pull
+        }
+
+        private void btn_push_Click(object sender, EventArgs e)
+        {
+            serialPort1.Write("smlok"); //push
         }
     }
 }

@@ -31,12 +31,12 @@ namespace DO_AN_VI_DIEU_KHIEN_FULL
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MAIN));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend5 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.tab_tinhtrang = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
@@ -206,21 +206,21 @@ namespace DO_AN_VI_DIEU_KHIEN_FULL
             // 
             // chnhietdo
             // 
-            chartArea5.AxisX.MajorGrid.Enabled = false;
-            chartArea5.AxisY.MajorGrid.Enabled = false;
-            chartArea5.Name = "nhietdo";
-            this.chnhietdo.ChartAreas.Add(chartArea5);
+            chartArea3.AxisX.MajorGrid.Enabled = false;
+            chartArea3.AxisY.MajorGrid.Enabled = false;
+            chartArea3.Name = "nhietdo";
+            this.chnhietdo.ChartAreas.Add(chartArea3);
             this.chnhietdo.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend5.Name = "Legend1";
-            this.chnhietdo.Legends.Add(legend5);
+            legend3.Name = "Legend1";
+            this.chnhietdo.Legends.Add(legend3);
             this.chnhietdo.Location = new System.Drawing.Point(0, 0);
             this.chnhietdo.Name = "chnhietdo";
-            series5.ChartArea = "nhietdo";
-            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            series5.Legend = "Legend1";
-            series5.Name = "NHIỆT ĐỘ";
-            this.chnhietdo.Series.Add(series5);
+            series3.ChartArea = "nhietdo";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            series3.Legend = "Legend1";
+            series3.Name = "NHIỆT ĐỘ";
+            this.chnhietdo.Series.Add(series3);
             this.chnhietdo.Size = new System.Drawing.Size(761, 279);
             this.chnhietdo.TabIndex = 0;
             this.chnhietdo.Text = "nhietdo";
@@ -291,20 +291,20 @@ namespace DO_AN_VI_DIEU_KHIEN_FULL
             // 
             // chdoam
             // 
-            chartArea6.AxisX.MajorGrid.Enabled = false;
-            chartArea6.AxisY.MajorGrid.Enabled = false;
-            chartArea6.Name = "ChartArea1";
-            this.chdoam.ChartAreas.Add(chartArea6);
+            chartArea4.AxisX.MajorGrid.Enabled = false;
+            chartArea4.AxisY.MajorGrid.Enabled = false;
+            chartArea4.Name = "ChartArea1";
+            this.chdoam.ChartAreas.Add(chartArea4);
             this.chdoam.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend6.Name = "Legend1";
-            this.chdoam.Legends.Add(legend6);
+            legend4.Name = "Legend1";
+            this.chdoam.Legends.Add(legend4);
             this.chdoam.Location = new System.Drawing.Point(0, 0);
             this.chdoam.Name = "chdoam";
-            series6.ChartArea = "ChartArea1";
-            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series6.Legend = "Legend1";
-            series6.Name = "ĐỘ ẨM";
-            this.chdoam.Series.Add(series6);
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series4.Legend = "Legend1";
+            series4.Name = "ĐỘ ẨM";
+            this.chdoam.Series.Add(series4);
             this.chdoam.Size = new System.Drawing.Size(761, 269);
             this.chdoam.TabIndex = 3;
             this.chdoam.Text = "doam";
@@ -377,6 +377,7 @@ namespace DO_AN_VI_DIEU_KHIEN_FULL
             this.btn_push.TabIndex = 11;
             this.btn_push.Text = "PUSH";
             this.btn_push.UseVisualStyleBackColor = true;
+            this.btn_push.Click += new System.EventHandler(this.btn_push_Click);
             // 
             // btn_pull
             // 
@@ -386,6 +387,7 @@ namespace DO_AN_VI_DIEU_KHIEN_FULL
             this.btn_pull.TabIndex = 10;
             this.btn_pull.Text = "PULL";
             this.btn_pull.UseVisualStyleBackColor = true;
+            this.btn_pull.Click += new System.EventHandler(this.btn_pull_Click);
             // 
             // groupBox3
             // 
